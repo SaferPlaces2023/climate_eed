@@ -23,3 +23,5 @@
 # Created:     19/03/2024
 # -------------------------------------------------------------------------------
 from .main import main
+from .module_commands import fetch_var, list_repo_vars
+from .module_config import Config
