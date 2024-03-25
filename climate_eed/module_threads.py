@@ -40,8 +40,9 @@ def get_planetary_item(item, varname, bbox, factor):
     if asset:
         dataset = xr.open_dataset(asset.href, **asset.extra_fields["xarray:open_kwargs"])
         ds = dataset[varname]
-        ds_sliced = ds.sel(lat=slice(bbox[3],bbox[1]), lon=slice(bbox[0],bbox[2])) * factor
-        output_ds = ds_sliced
+        if bbox:
+            ds = ds.sel(lat=slice(bbox[3],bbox[1]), lon=slice(bbox[0],bbox[2])) * factor
+        output_ds = ds
     return output_ds
 
 

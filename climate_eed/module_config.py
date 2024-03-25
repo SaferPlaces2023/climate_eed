@@ -11,7 +11,7 @@ class Config:
     DEFAULT_REPOSITORY = "planetary"
     DEFAULT_COLLECTIONS = "era5-pds"
     DEFAULT_QUERY = ""
-    DEFAULT_OUT_FORMAT = ""
+    DEFAULT_FILEOUT = ""
     DEFAULT_RETURN_FORMAT = "xr"
     DEFAULT_VERSION = False
     DEFAULT_LIST_VARS = False

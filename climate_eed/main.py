@@ -32,7 +32,7 @@ def preprocess_json(json_str):
 @click.option("--repository", type=click.STRING, required=False, default=Config.DEFAULT_REPOSITORY, help="The repository to fetch from: Example https://planetarycomputer.microsoft.com/api/stac/v1/")
 @click.option("--collections", type=click.STRING, required=False, default=Config.DEFAULT_COLLECTIONS, help="The collections of the repository to fetch from. Example: era5-pds")
 @click.option("--query", type=click.STRING, required=False, default="", help="The query to fetch from the repository")
-@click.option("--out_format", type=click.STRING, required=False, default="", help="The output format to save the results to. Can be pandas csv (csv) or Netcdf (nc).")
+@click.option("--fileout", type=click.STRING, required=False, default="", help="The file to save the output to, must have extension .csv or .nc. Example: output.nc or out.csv")
 @click.option("--return_format", type=click.STRING, required=False, default="xr", help="The output format to return the results in. Can be pandas dataframe (pd) or xarray dataset (xr). Default is xarray dataset (xr).")
 @click.option("--version", is_flag=True, required=False, default=False, help="Print version and exit.")
 @click.option("--list_vars", is_flag=True, required=False, default=False, help="List available variables in the repository. Requires --repository and --collections.")
@@ -46,11 +46,17 @@ def main(varname=Config.DEFAULT_VARNAME,
          collections=Config.DEFAULT_COLLECTIONS, 
          query=Config.DEFAULT_QUERY, 
          return_format=Config.DEFAULT_RETURN_FORMAT, 
-         out_format=Config.DEFAULT_OUT_FORMAT, 
+         fileout=Config.DEFAULT_FILEOUT, 
          version=Config.DEFAULT_VERSION, 
          list_vars=Config.DEFAULT_LIST_VARS, 
          list_repos=Config.DEFAULT_LIST_REPOS):
     
+    print("QUERY:")
+    print(query)
+    print(type(query))
+
+
+
     if version:
         click.echo("climate_eed v%s" % get_version())
         return 0
@@ -69,7 +75,8 @@ def main(varname=Config.DEFAULT_VARNAME,
         end_date=end_date, 
         repository=repository, 
         collections=collections,
-        query=query
+        query=query,
+        fileout=fileout
     )
     
     
