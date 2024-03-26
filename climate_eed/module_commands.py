@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import os
 from dask.diagnostics import ProgressBar
-from climate_eed.module_config import Config, parse_bbox, parse_collections, parse_dates, parse_repository
+from climate_eed.module_config import Config, parse_bbox, parse_collections, parse_dates, parse_query, parse_repository
 from climate_eed.module_threads import get_planetary_item_thr, join_thread, start_thread
 
 
@@ -66,13 +66,24 @@ def fetch_var(varname=Config.DEFAULT_VARNAME,
          query=Config.DEFAULT_QUERY, 
          return_format=Config.DEFAULT_RETURN_FORMAT, 
          fileout=Config.DEFAULT_FILEOUT):
-
-    if isinstance(query, str):
-        try:
-            query = json.loads(query)
-        except json.JSONDecodeError as error:
-            print(error)
     
+    """
+    Fetches data from a STAC repository and returns it as a pandas dataframe or xarray dataset.
+    Args:
+        - varname (str): The variable name to fetch. Example: "tasmax".
+        - factor (float): The factor to multiply the variable by. Example: 1000.
+        - bbox (list): The bounding box to fetch the data from. Example: [6.75, 36.75, 18.28, 47.00].
+        - start_date (str): The start date of the data to fetch. Example: "01-01-2020".
+        - end_date (str): The end date of the data to fetch. Example: "01-02-2020".
+        - repository (str): The STAC repository to fetch the data from. Example: "planetary".
+        - collections (str): The collections to fetch the data from. Example: "era5-pds".
+        - query (str): The query to filter the data by. Example: {"era5:kind": {"eq": "fc"}}.
+        - return_format (str): The format to return the data in. Example: "pd" or "xr".
+        - fileout (str): The file to output the data to. Example: "*.csv" or "*.nc".
+    Returns:
+        - pd.DataFrame or xr.Dataset: The data fetched from the STAC repository."""
+
+    query = parse_query(query)
     start_date, end_date = parse_dates(start_date, end_date)
     collections = parse_collections(collections)
     bbox = parse_bbox(bbox)

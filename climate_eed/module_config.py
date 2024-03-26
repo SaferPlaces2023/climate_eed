@@ -17,6 +17,21 @@ class Config:
     DEFAULT_LIST_VARS = False
     DEFAULT_LIST_REPOS = False
 
+
+def parse_query(query):
+    if isinstance(query, str):
+        try:
+            query = json.loads(query)
+        except json.JSONDecodeError as error:
+            print(error)
+            return 0
+    elif isinstance(query, dict):
+        pass
+    else:
+        print("Invalid query type")
+        return 0
+    return query
+    
 def parse_dates(start_date, end_date):
     # Define your start and end dates for the entire period you want to fetch
     date_format = "%d-%m-%Y"
