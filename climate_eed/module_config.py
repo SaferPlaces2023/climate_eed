@@ -34,7 +34,7 @@ def parse_query(query):
     
 def parse_dates(start_date, end_date):
     # Define your start and end dates for the entire period you want to fetch
-    date_format = "%Y-%m-%d"
+    date_format = "%d-%m-%Y"
     start_date = datetime.strptime(start_date, date_format).isoformat()
     end_date = datetime.strptime(end_date, date_format).isoformat()
     return start_date, end_date
