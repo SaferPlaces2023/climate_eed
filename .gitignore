@@ -3,3 +3,6 @@ venv
 build
 *.csv
 *.nc
+.env
+test_data
+__pycache__
