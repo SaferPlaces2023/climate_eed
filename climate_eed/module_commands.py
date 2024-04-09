@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 from dask.diagnostics import ProgressBar
-from climate_eed.module_config import Config, parse_bbox, parse_collections, parse_dates, parse_query, parse_repository
+from climate_eed.module_config import CopernicusConfig, PlanetaryConfig, parse_bbox, parse_collections, parse_dates, parse_query, parse_repository
 from climate_eed.module_planetary_operations import data_request, var_list_request
 
 
@@ -18,21 +18,47 @@ def list_repo_vars(repository, collections):
     return var_list
 
 
-def fetch_var(varname=Config.DEFAULT_VARNAME, 
-         factor=Config.DEFAULT_FACTOR, 
-         bbox=Config.DEFAULT_BBOX, 
-         start_date=Config.DEFALUT_START_DATE, 
-         end_date=Config.DEFALUT_END_DATE, 
-         repository=Config.DEFAULT_REPOSITORY, 
-         collections=Config.DEFAULT_COLLECTIONS, 
-         query=Config.DEFAULT_QUERY, 
-         return_format=Config.DEFAULT_RETURN_FORMAT, 
-         fileout=Config.DEFAULT_FILEOUT):
+# def fetch_var_copernicus(varname=CopernicusConfig.DEFAULT_VARNAME,
+#                          factor=CopernicusConfig.DEFAULT_FACTOR, 
+#                          bbox=CopernicusConfig.DEFAULT_BBOX, 
+#                          years=CopernicusConfig.DEFAULT_YEARS, 
+#                          month=CopernicusConfig.DEFAULT_MONTH, 
+#                          leadtime_month=CopernicusConfig.DEFAULT_LEADTIME_MONTH, 
+#                          fileout=CopernicusConfig.DEFAULT_FILEOUT):
+#     """
+#     Fetches data from the Copernicus Climate Data Store API and returns it as an xarray dataset.
+#     Args:
+#         - varname (str): The variable name to fetch. Example: "total_precipitation".
+#         - factor (float): The factor to multiply the variable by. Example: 1000.
+#         - bbox (list): The bounding box to fetch the data from. Example: [6.75, 36.75, 18.28, 47.00].
+#         - years (str): The year of the data to fetch. Example:  ['1993', '1994', '1995'].
+#         - month (str): The month of the data to fetch. Example: "05".
+#         - leadtime_month (str): The leadtime month of the data to fetch. Example: ['1', '2', '3', '4', '5', '6'].
+#         - fileout (str): The file to output the data to. Example: "*.grib".
+#     Returns:
+#         - xr.Dataset: The data fetched from the Copernicus Climate Data Store API.
+#     """
+#     output_ds = data_request(varname, factor, bbox, years, month, leadtime_month, fileout)
+    
+#     return output_ds
+
+def fetch_var(varname=PlanetaryConfig.DEFAULT_VARNAME, 
+         models=PlanetaryConfig.DEFAULT_MODELS,
+         factor=PlanetaryConfig.DEFAULT_FACTOR, 
+         bbox=PlanetaryConfig.DEFAULT_BBOX, 
+         start_date=PlanetaryConfig.DEFALUT_START_DATE, 
+         end_date=PlanetaryConfig.DEFALUT_END_DATE, 
+         repository=PlanetaryConfig.DEFAULT_REPOSITORY, 
+         collections=PlanetaryConfig.DEFAULT_COLLECTIONS, 
+         query=PlanetaryConfig.DEFAULT_QUERY, 
+         return_format=PlanetaryConfig.DEFAULT_RETURN_FORMAT, 
+         fileout=PlanetaryConfig.DEFAULT_FILEOUT):
     
     """
     Fetches data from a STAC repository and returns it as a pandas dataframe or xarray dataset.
     Args:
         - varname (str): The variable name to fetch. Example: "tasmax".
+        - models (str): The models to fetch the data from. Example: "GFDL-ESM4".
         - factor (float): The factor to multiply the variable by. Example: 1000.
         - bbox (list): The bounding box to fetch the data from. Example: [6.75, 36.75, 18.28, 47.00].
         - start_date (str): The start date of the data to fetch. Example: "01-01-2020".
@@ -60,7 +86,7 @@ def fetch_var(varname=Config.DEFAULT_VARNAME,
     # print("Collections: ", collections)
     # print("Query: ", query, type(query))
 
-    output_ds = data_request(varname, factor, bbox, start_date, end_date, repository, collections, query)
+    output_ds = data_request(varname, models, factor, bbox, start_date, end_date, repository, collections, query)
     # print("OUTPUT DS: ", output_ds)
     df = None
     if return_format == "pd":

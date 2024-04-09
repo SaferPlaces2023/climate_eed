@@ -2,8 +2,9 @@
 from datetime import datetime
 import json
 
-class Config:
+class PlanetaryConfig:
     DEFAULT_VARNAME = ""
+    DEFAULT_MODELS = ""
     DEFAULT_FACTOR = 1
     DEFAULT_BBOX = ""
     DEFALUT_START_DATE = ""
@@ -16,6 +17,17 @@ class Config:
     DEFAULT_VERSION = False
     DEFAULT_LIST_VARS = False
     DEFAULT_LIST_REPOS = False
+
+class CopernicusConfig:
+    DEFAULT_VARNAME = ""
+    DEFAULT_FACTOR = 1
+    DEFAULT_BBOX = ""
+    DEFAULT_FILEOUT = ""
+    DEFAULT_YEARS = ""
+    DEFAULT_MONTH = ""
+    DEFAULT_LEADTIME_MONTH = ""
+    DEFAULT_RETURN_FORMAT = "xr"
+    DEFAULT_VERSION = False
 
 
 def parse_query(query):
@@ -57,7 +69,10 @@ def parse_bbox(bbox):
     return bbox
 
 def parse_collections(collections):
-    collections = [str(x) for x in collections.split(",")]
+    if isinstance(collections, list):
+        collections = [str(x) for x in collections]
+    elif isinstance(collections, str):
+        collections = [str(x) for x in collections.split(",")]
     return collections
 
 # def parse_arguments(repository, key, query_list, collections):

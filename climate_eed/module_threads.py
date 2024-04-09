@@ -46,8 +46,23 @@ def get_planetary_item(item, varname, bbox, factor):
     return output_ds
 
 
+def get_planetary_model(item, varname, bbox, factor):
+    output_ds = None
+    asset = item.assets[varname]
+
+    if asset:    
+        ds = xr.open_dataset(asset.href, **asset.extra_fields["xarray:open_kwargs"])
+        output_ds = ds
+    return output_ds
+
+
 def get_planetary_item_thr(item, varname, bbox, factor):
     thread = ThreadReturn(target=get_planetary_item, kwargs={"item":item,"varname":varname,"bbox":bbox,"factor":factor})
+    return thread
+
+
+def get_planetary_model_thr(item, varname, bbox, factor):
+    thread = ThreadReturn(target=get_planetary_model, kwargs={"item":item,"varname":varname,"bbox":bbox,"factor":factor})
     return thread
 
 
