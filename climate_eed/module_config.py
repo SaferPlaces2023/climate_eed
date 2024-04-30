@@ -1,6 +1,11 @@
 
 from datetime import datetime
 import json
+import os
+
+from dotenv import find_dotenv, load_dotenv
+
+load_dotenv(find_dotenv())
 
 class PlanetaryConfig:
     DEFAULT_VARNAME = ""
@@ -30,18 +35,21 @@ class CopernicusConfig:
     DEFAULT_VERSION = False
 
 
+class ICISKConfig:
+    STACAPI_SEASONAL_FORECASTS_URL = os.environ.get("STACAPI_SEASONAL_FORECASTS_URL")
+
 def parse_query(query):
     if isinstance(query, str):
         try:
             query = json.loads(query)
         except json.JSONDecodeError as error:
-            print(error)
-            return 0
+            # print(error)
+            return {}
     elif isinstance(query, dict):
         pass
     else:
         print("Invalid query type")
-        return 0
+        return {}
     return query
     
 def parse_dates(start_date, end_date):
@@ -54,6 +62,10 @@ def parse_dates(start_date, end_date):
 def parse_repository(repository):
     if(repository == "planetary"):
         repo = "https://planetarycomputer.microsoft.com/api/stac/v1/"
+    elif repository == "icisk":
+        repo = ICISKConfig.STACAPI_SEASONAL_FORECASTS_URL
+    # elif(repository == "copernicus"):
+    #     repo = "https://cds.climate.copernicus.eu/api/v2"
     else:
         print("Unknown repository")
         repo = None

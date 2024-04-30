@@ -38,6 +38,7 @@ def preprocess_json(json_str):
 @click.option("--version", is_flag=True, required=False, default=False, help="Print version and exit.")
 @click.option("--list_vars", is_flag=True, required=False, default=False, help="List available variables in the repository. Requires --repository and --collections.")
 @click.option("--list_repos", is_flag=True, required=False, default=False, help="List available repositories. Requires --repository and --collections.")
+@click.option("--additional_params", is_flag=True, required=False, default="", help="Additional parameters to pass to the query. Must be a JSON string. Example: {'basin_id': '1234'}")
 def main(varname=PlanetaryConfig.DEFAULT_VARNAME, 
          models=PlanetaryConfig.DEFAULT_MODELS,
          factor=PlanetaryConfig.DEFAULT_FACTOR, 
@@ -51,7 +52,8 @@ def main(varname=PlanetaryConfig.DEFAULT_VARNAME,
          fileout=PlanetaryConfig.DEFAULT_FILEOUT, 
          version=PlanetaryConfig.DEFAULT_VERSION, 
          list_vars=PlanetaryConfig.DEFAULT_LIST_VARS, 
-         list_repos=PlanetaryConfig.DEFAULT_LIST_REPOS):
+         list_repos=PlanetaryConfig.DEFAULT_LIST_REPOS,
+         additional_params=None):
 
     if version:
         click.echo("climate_eed v%s" % get_version())
@@ -73,7 +75,8 @@ def main(varname=PlanetaryConfig.DEFAULT_VARNAME,
         repository=repository, 
         collections=collections,
         query=query,
-        fileout=fileout
+        fileout=fileout,
+        additional_params=additional_params,
     )
     
     return df

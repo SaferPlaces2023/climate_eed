@@ -2,6 +2,8 @@ import inspect
 import threading
 import planetary_computer
 import xarray as xr 
+import s3fs
+
 
 class ThreadReturn(threading.Thread):
     def __init__(self, target, args=None, kwargs=None):
@@ -46,6 +48,30 @@ def get_planetary_item(item, varname, bbox, factor):
     return output_ds
 
 
+def get_seasonal_forecast_item(item, varname, factor, basin_id):
+
+    fs_s3 = s3fs.S3FileSystem(anon=True) 
+    output_ds = None
+    asset = item.get_assets()['data']
+    if asset:
+        asset_href = asset.href
+        s3_file_obj = fs_s3.open(asset_href, mode='rb')
+        dataset = xr.open_dataset(s3_file_obj,engine='h5netcdf')
+        
+        dataset.coords['model'] = item.properties['model']
+        if varname:
+            ds = dataset[varname]
+        else:
+            ds = dataset['COUT']
+
+        if basin_id:
+            ds = ds.sel(id=int(basin_id))
+        # if bbox:
+        #     ds = ds.sel(geo_y=slice(bbox[3],bbox[1]), geo_x=slice(bbox[0],bbox[2]))
+        output_ds = ds * factor
+    return output_ds
+
+
 def get_planetary_model(item, varname, bbox, factor):
     output_ds = None
     asset = item.assets[varname]
@@ -58,6 +84,11 @@ def get_planetary_model(item, varname, bbox, factor):
 
 def get_planetary_item_thr(item, varname, bbox, factor):
     thread = ThreadReturn(target=get_planetary_item, kwargs={"item":item,"varname":varname,"bbox":bbox,"factor":factor})
+    return thread
+
+
+def get_seasonal_forecast_item_thr(item, varname, factor, basin_id):
+    thread = ThreadReturn(target=get_seasonal_forecast_item, kwargs={"item":item,"varname":varname,"factor":factor, "basin_id":basin_id})
     return thread
 
 

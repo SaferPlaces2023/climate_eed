@@ -1,10 +1,7 @@
-from datetime import datetime
-import json
-import pandas as pd
-import numpy as np
 import os
 from dask.diagnostics import ProgressBar
-from climate_eed.module_config import CopernicusConfig, PlanetaryConfig, parse_bbox, parse_collections, parse_dates, parse_query, parse_repository
+from climate_eed.module_config import CopernicusConfig, ICISKConfig, PlanetaryConfig, parse_bbox, parse_collections, parse_dates, parse_query, parse_repository
+from climate_eed.module_icisk_operations import icisk_data_request
 from climate_eed.module_planetary_operations import data_request, var_list_request
 
 
@@ -52,7 +49,8 @@ def fetch_var(varname=PlanetaryConfig.DEFAULT_VARNAME,
          collections=PlanetaryConfig.DEFAULT_COLLECTIONS, 
          query=PlanetaryConfig.DEFAULT_QUERY, 
          return_format=PlanetaryConfig.DEFAULT_RETURN_FORMAT, 
-         fileout=PlanetaryConfig.DEFAULT_FILEOUT):
+         fileout=PlanetaryConfig.DEFAULT_FILEOUT,
+         additional_params=None):
     
     """
     Fetches data from a STAC repository and returns it as a pandas dataframe or xarray dataset.
@@ -72,21 +70,15 @@ def fetch_var(varname=PlanetaryConfig.DEFAULT_VARNAME,
         - pd.DataFrame or xr.Dataset: The data fetched from the STAC repository."""
 
     query = parse_query(query)
-    start_date, end_date = parse_dates(start_date, end_date)
+    if start_date and end_date:
+        start_date, end_date = parse_dates(start_date, end_date)
     collections = parse_collections(collections)
     bbox = parse_bbox(bbox)
     repository = parse_repository(repository)
-
-    # print("Varname: ", varname)
-    # print("Factor: ", factor)
-    # print("Bbox: ", bbox)
-    # print("Start Date: ", start_date)
-    # print("End Date: ", end_date)
-    # print("Repository: ", repository)
-    # print("Collections: ", collections)
-    # print("Query: ", query, type(query))
-
-    output_ds = data_request(varname, models, factor, bbox, start_date, end_date, repository, collections, query)
+    if repository == ICISKConfig.STACAPI_SEASONAL_FORECASTS_URL:
+        output_ds = icisk_data_request(varname, models, factor, bbox, start_date, end_date, repository, collections, query, additional_params)
+    else:
+        output_ds = data_request(varname, models, factor, bbox, start_date, end_date, repository, collections, query)
     # print("OUTPUT DS: ", output_ds)
     df = None
     if return_format == "pd":

@@ -114,3 +114,23 @@ def test_ensemble_fetch_var_sel_model():
     print("----------------")
     assert type(data_ensemble) == xr.DataArray
     assert data_ensemble.shape == (1, 2189, 40, 40)
+
+
+def test_seasonal_forecasts_fetch_var():
+    """Test the fetch_var function for seasonal_forecasts collection."""
+    
+    # var_ensemble = "tasmax"
+    # start_date_str = "01-01-2095"
+    # end_date_str = "31-12-2100"
+    # # factor_sel = 1000
+    # location_str = ["30.0","9.0","40.0","19.0"]
+    # collections = ["cil-gdpcir-cc0","cil-gdpcir-cc-by"]
+    # query = {"cmip6:experiment_id": {"eq": "ssp370"}}
+    # models = ["GFDL-ESM4"]
+    collections = ["seasonal_forecasts"]
+    data_seasonal_forecasts = fetch_var(collections=collections,repository="icisk",additional_params={"basin_id": "301515"})
+    
+    print(data_seasonal_forecasts)
+    print("----------------")
+    assert type(data_seasonal_forecasts) == xr.DataArray
+    assert data_seasonal_forecasts.shape == (2, 213)
