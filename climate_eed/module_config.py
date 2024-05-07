@@ -67,8 +67,7 @@ def parse_repository(repository):
     # elif(repository == "copernicus"):
     #     repo = "https://cds.climate.copernicus.eu/api/v2"
     else:
-        print("Unknown repository")
-        repo = None
+        repo = repository
     return repo
     
 def parse_bbox(bbox):
