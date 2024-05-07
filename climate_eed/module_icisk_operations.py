@@ -24,32 +24,38 @@ def icisk_data_request(varname, models, factor, bbox, start_date, end_date, repo
     output_ds = None
 
     catalog = pystac_client.Client.open(repository)
-    # client = Client.open('http://127.0.0.1:8083/')  # Replace with the URL of your catalog
     catalog.add_conforms_to("ITEM_SEARCH")
     catalog.add_conforms_to("QUERY")
     search_results = catalog.search(
         collections=collections, datetime=[start_date, end_date], query=query
     )
     items = search_results.items()
-    basin_id = None
-    if additional_params and "basin_id" in additional_params:
-        basin_id = additional_params["basin_id"]
+    # basin_id = None
+    # if additional_params and "basin_id" in additional_params:
+    #     basin_id = additional_params["basin_id"]
     threads = []
     for item in items:
-        thrd = get_seasonal_forecast_item_thr(item=item, varname=varname, factor=factor, basin_id=basin_id)
+        thrd = get_seasonal_forecast_item_thr(item=item, varname=varname, factor=factor)
         start_thread(thrd)
         threads.append(thrd)
-
+    data_arrays = []
+    coverage = None
     for thrd in threads:
         join_thread(thrd)
         ds_sliced = thrd.get_return_value()
-        try:
-            if output_ds is None:
-                output_ds = ds_sliced
-            else:
-                output_ds = xr.concat([output_ds, ds_sliced], dim="model")
-        except Exception as e:
-            print("Exception")
-            print(e)
-
-    return output_ds
+        data_arrays.append(ds_sliced)
+        # try:
+        #     if output_ds is None:
+        #         output_ds = ds_sliced
+        #     else:
+        #         output_ds = xr.concat([output_ds, ds_sliced], dim="model")
+        # except Exception as e:
+        #     print("Exception")
+        #     print(e)
+    if data_arrays:
+        # print("DATA ARRAYS")
+        # print(data_arrays)
+        # print("**************************************")
+        agg_dataset = xr.merge(data_arrays, join='outer')
+        # coverage = xarray_to_prs_coverage_json(agg_dataset)
+    return agg_dataset

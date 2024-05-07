@@ -48,7 +48,7 @@ def get_planetary_item(item, varname, bbox, factor):
     return output_ds
 
 
-def get_seasonal_forecast_item(item, varname, factor, basin_id):
+def get_seasonal_forecast_item(item, varname, factor):
 
     fs_s3 = s3fs.S3FileSystem(anon=True) 
     output_ds = None
@@ -58,17 +58,21 @@ def get_seasonal_forecast_item(item, varname, factor, basin_id):
         s3_file_obj = fs_s3.open(asset_href, mode='rb')
         dataset = xr.open_dataset(s3_file_obj,engine='h5netcdf')
         
-        dataset.coords['model'] = item.properties['model']
+        # print("ITEM PROPERTIES")
+        # print(item)
+        # print("---")
+        # print(item.properties)
+        
         if varname:
-            ds = dataset[varname]
-        else:
-            ds = dataset['COUT']
-
-        if basin_id:
-            ds = ds.sel(id=int(basin_id))
+            output_ds = dataset.drop_vars([var for var in dataset.variables if var != varname and var != "geo_x" and var != "geo_y" and var != "geo_z" and var != "time" and var != "id"])
+        
+        output_ds = output_ds.rename_vars({ 'COUT': f"COUT_{item.properties['model']}" })
+        
+        # else:
+        #     ds = dataset['COUT']
         # if bbox:
         #     ds = ds.sel(geo_y=slice(bbox[3],bbox[1]), geo_x=slice(bbox[0],bbox[2]))
-        output_ds = ds * factor
+        # output_ds = ds * factor
     return output_ds
 
 
@@ -87,8 +91,8 @@ def get_planetary_item_thr(item, varname, bbox, factor):
     return thread
 
 
-def get_seasonal_forecast_item_thr(item, varname, factor, basin_id):
-    thread = ThreadReturn(target=get_seasonal_forecast_item, kwargs={"item":item,"varname":varname,"factor":factor, "basin_id":basin_id})
+def get_seasonal_forecast_item_thr(item, varname, factor):
+    thread = ThreadReturn(target=get_seasonal_forecast_item, kwargs={"item":item,"varname":varname,"factor":factor})
     return thread
 
 
