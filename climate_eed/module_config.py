@@ -18,7 +18,6 @@ class PlanetaryConfig:
     DEFAULT_COLLECTIONS = "era5-pds"
     DEFAULT_QUERY = ""
     DEFAULT_FILEOUT = ""
-    DEFAULT_RETURN_FORMAT = "xr"
     DEFAULT_VERSION = False
     DEFAULT_LIST_VARS = False
     DEFAULT_LIST_REPOS = False
@@ -31,12 +30,16 @@ class CopernicusConfig:
     DEFAULT_YEARS = ""
     DEFAULT_MONTH = ""
     DEFAULT_LEADTIME_MONTH = ""
-    DEFAULT_RETURN_FORMAT = "xr"
+    DEFAULT_FILE_GRIB = "data.grib"
     DEFAULT_VERSION = False
 
 
-class ICISKConfig:
-    STACAPI_SEASONAL_FORECASTS_URL = os.environ.get("STACAPI_SEASONAL_FORECASTS_URL")
+class SMHIConfig:
+    # STACAPI_SEASONAL_FORECASTS_URL = os.environ.get("STACAPI_SEASONAL_FORECASTS_URL")
+    FTP_HOST = os.environ.get("FTP_HOST")
+    FTP_USER = os.environ.get("FTP_USER")
+    FTP_PASS = os.environ.get("FTP_PASS")
+    FTP_DIR = os.environ.get("FTP_DIR")
 
 def parse_query(query):
     if isinstance(query, str):
@@ -62,8 +65,8 @@ def parse_dates(start_date, end_date):
 def parse_repository(repository):
     if(repository == "planetary"):
         repo = "https://planetarycomputer.microsoft.com/api/stac/v1/"
-    elif repository == "icisk":
-        repo = ICISKConfig.STACAPI_SEASONAL_FORECASTS_URL
+    # elif repository == "smhi":
+    #     repo = SMHIConfig.STACAPI_SEASONAL_FORECASTS_URL
     # elif(repository == "copernicus"):
     #     repo = "https://cds.climate.copernicus.eu/api/v2"
     else:

@@ -23,5 +23,5 @@
 # Created:     19/03/2024
 # -------------------------------------------------------------------------------
 from .main import main
-from .module_commands import fetch_var, list_repo_vars
+from .module_commands import fetch_var_planetary, fetch_var_copernicus, fetch_var_smhi, list_repo_vars
 from .module_config import PlanetaryConfig

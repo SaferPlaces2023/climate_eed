@@ -7,7 +7,7 @@ import xarray as xr
 import urllib3 
 urllib3.disable_warnings()
 
-def data_request(varname, factor, bbox, years, month, leadtime_month,file_grib, fileout):
+def cds_data_request(dataset, query, fileout, engine='netcdf4'):
     """
     Fetches data from the Copernicus Climate Data Store API and returns it as an xarray dataset.
     Args:
@@ -28,24 +28,25 @@ def data_request(varname, factor, bbox, years, month, leadtime_month,file_grib, 
     URL = 'https://cds.climate.copernicus.eu/api/v2'
     KEY = os.environ.get('CDSAPI_KEY')
     # DATADIR = './test_data/seasonal'
+    # {
+    #     'format': 'grib',
+    #     'originating_centre': 'ecmwf',
+    #     'system': '5',
+    #     'variable': varname,
+    #     'product_type': 'monthly_mean',
+    #     'year': years,
+    #     'month': month,
+    #     'leadtime_month': leadtime_month,
+    # }
 
     c = cdsapi.Client(url=URL, key=KEY)
 
     # Hindcast data request
     c.retrieve(
-        'seasonal-monthly-single-levels',
-        {
-            'format': 'grib',
-            'originating_centre': 'ecmwf',
-            'system': '5',
-            'variable': varname,
-            'product_type': 'monthly_mean',
-            'year': years,
-            'month': month,
-            'leadtime_month': leadtime_month,
-        },
+        dataset,    # 'seasonal-monthly-single-levels',
+        query,
         fileout)
     
-    output_ds = xr.open_dataset(f'{fileout}', engine='cfgrib')
+    output_ds = xr.open_dataset(f'{fileout}', engine=engine)
     
     return output_ds

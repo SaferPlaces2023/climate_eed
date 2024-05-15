@@ -3,7 +3,7 @@ import re
 import sys
 import click
 from datetime import datetime, timedelta
-from climate_eed.module_commands import fetch_var, list_repo_vars
+from climate_eed.module_commands import fetch_var_planetary, list_repo_vars
 # from climate_eed.module_config import parse_arguments
 from climate_eed.welcome import get_version
 from climate_eed.module_config import PlanetaryConfig
@@ -34,11 +34,9 @@ def preprocess_json(json_str):
 @click.option("--collections", type=click.STRING, required=False, default=PlanetaryConfig.DEFAULT_COLLECTIONS, help="The collections of the repository to fetch from. Example: era5-pds")
 @click.option("--query", type=click.STRING, required=False, default="", help="The query to fetch from the repository")
 @click.option("--fileout", type=click.STRING, required=False, default="", help="The file to save the output to, must have extension .csv or .nc. Example: output.nc or out.csv")
-@click.option("--return_format", type=click.STRING, required=False, default="xr", help="The output format to return the results in. Can be pandas dataframe (pd) or xarray dataset (xr). Default is xarray dataset (xr).")
 @click.option("--version", is_flag=True, required=False, default=False, help="Print version and exit.")
 @click.option("--list_vars", is_flag=True, required=False, default=False, help="List available variables in the repository. Requires --repository and --collections.")
 @click.option("--list_repos", is_flag=True, required=False, default=False, help="List available repositories. Requires --repository and --collections.")
-@click.option("--additional_params", is_flag=True, required=False, default="", help="Additional parameters to pass to the query. Must be a JSON string. Example: {'basin_id': '1234'}")
 def main(varname=PlanetaryConfig.DEFAULT_VARNAME, 
          models=PlanetaryConfig.DEFAULT_MODELS,
          factor=PlanetaryConfig.DEFAULT_FACTOR, 
@@ -48,12 +46,10 @@ def main(varname=PlanetaryConfig.DEFAULT_VARNAME,
          repository=PlanetaryConfig.DEFAULT_REPOSITORY, 
          collections=PlanetaryConfig.DEFAULT_COLLECTIONS, 
          query=PlanetaryConfig.DEFAULT_QUERY, 
-         return_format=PlanetaryConfig.DEFAULT_RETURN_FORMAT, 
          fileout=PlanetaryConfig.DEFAULT_FILEOUT, 
          version=PlanetaryConfig.DEFAULT_VERSION, 
          list_vars=PlanetaryConfig.DEFAULT_LIST_VARS, 
-         list_repos=PlanetaryConfig.DEFAULT_LIST_REPOS,
-         additional_params=None):
+         list_repos=PlanetaryConfig.DEFAULT_LIST_REPOS):
 
     if version:
         click.echo("climate_eed v%s" % get_version())
@@ -65,7 +61,7 @@ def main(varname=PlanetaryConfig.DEFAULT_VARNAME,
         click.echo(repo_vars)
         return 0
 
-    df = fetch_var(
+    df = fetch_var_planetary(
         varname=varname, 
         models=models,
         factor=factor, 
@@ -74,9 +70,7 @@ def main(varname=PlanetaryConfig.DEFAULT_VARNAME,
         end_date=end_date, 
         repository=repository, 
         collections=collections,
-        query=query,
-        fileout=fileout,
-        additional_params=additional_params,
+        query=query
     )
     
     return df

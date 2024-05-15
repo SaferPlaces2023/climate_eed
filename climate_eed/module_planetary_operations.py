@@ -6,7 +6,54 @@ import planetary_computer
 from climate_eed.module_threads import get_planetary_item_thr, get_planetary_model_thr, join_thread, start_thread
 
 
-def data_request(varname, models, factor, bbox, start_date, end_date, repository, collections, query):
+def get_data_from_items(items, varname, factor, bbox):
+    output_ds = None
+    threads = []
+    for item in items:
+        thrd = get_planetary_item_thr(item=item, varname=varname, bbox=bbox, factor=factor)
+        start_thread(thrd)
+        threads.append(thrd)
+
+    for thrd in threads:
+        join_thread(thrd)
+        ds_sliced = thrd.get_return_value()
+        try:
+            if output_ds is None:
+                output_ds = ds_sliced
+            else:
+                output_ds = xr.concat([output_ds, ds_sliced], dim="time")
+        except Exception as e:
+            print("Exception")
+            print(e)
+    return output_ds
+
+
+def get_data_from_models(ensemble, varname, factor, bbox):
+    output_ds = None
+    datasets_by_model = []
+    threads = []
+    for item in tqdm(ensemble):
+        thrd = get_planetary_model_thr(item=item, varname=varname, bbox=bbox, factor=factor)
+        start_thread(thrd)
+        threads.append(thrd)
+
+    for thrd in threads:
+        join_thread(thrd)
+        ds_sliced = thrd.get_return_value()
+        try:
+            datasets_by_model.append(ds_sliced)
+                
+        except Exception as e:
+            print("Exception")
+            print(e)
+    output_ds = xr.concat(
+        datasets_by_model,
+        dim=pd.Index([ds.attrs["source_id"] for ds in datasets_by_model], name="model"),
+        combine_attrs="drop_conflicts",
+    )
+    return output_ds
+
+def planetary_data_request(varname, models, factor, bbox, start_date, end_date, repository, collections, query):
     """
     Fetches data from a STAC repository and returns it as an xarray dataset.
     Args:
@@ -37,28 +84,11 @@ def data_request(varname, models, factor, bbox, start_date, end_date, repository
         )
 
         ensemble = search_results.item_collection()
-        datasets_by_model = []
-        threads = []
-        for item in tqdm(ensemble):
-            thrd = get_planetary_model_thr(item=item, varname=varname, bbox=bbox, factor=factor)
-            start_thread(thrd)
-            threads.append(thrd)
-
-        for thrd in threads:
-            join_thread(thrd)
-            ds_sliced = thrd.get_return_value()
-            try:
-                datasets_by_model.append(ds_sliced)
-                    
-            except Exception as e:
-                print("Exception")
-                print(e)
-
-        output_ds = xr.concat(
-            datasets_by_model,
-            dim=pd.Index([ds.attrs["source_id"] for ds in datasets_by_model], name="model"),
-            combine_attrs="drop_conflicts",
-        )
+        output_ds = get_data_from_models(ensemble, varname, factor, bbox)
+        print("OUTPUT")
+        print(output_ds)
+        print("****************************************")
+        
         if models:    
             output_ds = output_ds.tasmax.sel(
                 lon=slice(bbox[0], bbox[2]),
@@ -79,23 +109,7 @@ def data_request(varname, models, factor, bbox, start_date, end_date, repository
             collections=collections, datetime=[start_date, end_date], query=query
         )
         items = search_results.items()
-        threads = []
-        for item in items:
-            thrd = get_planetary_item_thr(item=item, varname=varname, bbox=bbox, factor=factor)
-            start_thread(thrd)
-            threads.append(thrd)
-
-        for thrd in threads:
-            join_thread(thrd)
-            ds_sliced = thrd.get_return_value()
-            try:
-                if output_ds is None:
-                    output_ds = ds_sliced
-                else:
-                    output_ds = xr.concat([output_ds, ds_sliced], dim="time")
-            except Exception as e:
-                print("Exception")
-                print(e)
+        output_ds = get_data_from_items(items, varname, factor, bbox)
     
     return output_ds
 
