@@ -31,7 +31,7 @@ def fetch_var_copernicus(dataset, query, fileout, engine='netcdf4'):
     return output_ds
 
 
-def fetch_var_smhi():
+def fetch_var_smhi(living_lab, data_dir, issue_date, ftp_config=None):
     """
     Fetches data from the Copernicus Climate Data Store API and returns it as an xarray dataset.
     Args:
@@ -41,7 +41,7 @@ def fetch_var_smhi():
     Returns:
         - xr.Dataset: The data fetched from the Copernicus Climate Data Store API.
     """
-    output_ds = smhi_data_request()
+    output_ds = smhi_data_request(living_lab=living_lab, data_dir=data_dir, issue_date=issue_date, ftp_config=ftp_config)
     
     return output_ds
 

@@ -1,6 +1,6 @@
 import xarray as xr
 import fsspec
-import s3fs
+# import s3fs
 from ftplib import FTP
 import os
 
@@ -37,7 +37,7 @@ def read_netcdf(file_path):
     return nc
 
 
-def smhi_data_request(living_lab="georgia", data_dir="seasonal_forecast", issue_date="202404"):
+def smhi_data_request(living_lab="georgia", data_dir="seasonal_forecast", issue_date="202404",ftp_config=None):
     """
     Fetches data from a STAC repository and returns it as an xarray dataset.
     Args:
@@ -53,22 +53,25 @@ def smhi_data_request(living_lab="georgia", data_dir="seasonal_forecast", issue_
         - xr.Dataset: The data fetched from the STAC repository.
     """
     data_array = []
-    ftp_config= {
-        "url":SMHIConfig.FTP_HOST,
-        "folder":SMHIConfig.FTP_DIR,
-        "user":SMHIConfig.FTP_USER,
-        "passwd":SMHIConfig.FTP_PASS
-    }
+    if ftp_config is None:    
+        config= {
+            "url":SMHIConfig.FTP_HOST,
+            "folder":SMHIConfig.FTP_DIR,
+            "user":SMHIConfig.FTP_USER,
+            "passwd":SMHIConfig.FTP_PASS
+        }
+    else:
+        config = ftp_config
 
     # Connect to FTP server
-    ftp = FTP(ftp_config['url'])
-    ftp.login(user=ftp_config['user'], passwd=ftp_config['passwd'])
+    ftp = FTP(config['url'])
+    ftp.login(user=config['user'], passwd=config['passwd'])
 
-    remote_folder = f"{ftp_config['folder']}/{living_lab}/{data_dir}/{issue_date}"
+    remote_folder = f"{config['folder']}/{living_lab}/{data_dir}/{issue_date}"
     local_folder = f"./{data_dir}/{issue_date}"
 
-    with FTP(ftp_config['url']) as ftp:
-        ftp.login(ftp_config['user'], ftp_config['passwd'])
+    with FTP(config['url']) as ftp:
+        ftp.login(config['user'], config['passwd'])
         ftp.cwd(remote_folder)
         
         files = download_files_from_ftp(ftp, remote_folder)

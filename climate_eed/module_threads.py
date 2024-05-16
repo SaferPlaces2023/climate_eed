@@ -2,7 +2,7 @@ import inspect
 import threading
 import planetary_computer
 import xarray as xr 
-import s3fs
+# import s3fs
 
 
 class ThreadReturn(threading.Thread):
@@ -48,32 +48,32 @@ def get_planetary_item(item, varname, bbox, factor):
     return output_ds
 
 
-def get_seasonal_forecast_item(item, varname, factor):
+# def get_seasonal_forecast_item(item, varname, factor):
 
-    fs_s3 = s3fs.S3FileSystem(anon=True) 
-    output_ds = None
-    asset = item.get_assets()['data']
-    if asset:
-        asset_href = asset.href
-        s3_file_obj = fs_s3.open(asset_href, mode='rb')
-        dataset = xr.open_dataset(s3_file_obj,engine='h5netcdf')
+#     fs_s3 = s3fs.S3FileSystem(anon=True) 
+#     output_ds = None
+#     asset = item.get_assets()['data']
+#     if asset:
+#         asset_href = asset.href
+#         s3_file_obj = fs_s3.open(asset_href, mode='rb')
+#         dataset = xr.open_dataset(s3_file_obj,engine='h5netcdf')
         
-        # print("ITEM PROPERTIES")
-        # print(item)
-        # print("---")
-        # print(item.properties)
+#         # print("ITEM PROPERTIES")
+#         # print(item)
+#         # print("---")
+#         # print(item.properties)
         
-        if varname:
-            output_ds = dataset.drop_vars([var for var in dataset.variables if var != varname and var != "geo_x" and var != "geo_y" and var != "geo_z" and var != "time" and var != "id"])
+#         if varname:
+#             output_ds = dataset.drop_vars([var for var in dataset.variables if var != varname and var != "geo_x" and var != "geo_y" and var != "geo_z" and var != "time" and var != "id"])
         
-        output_ds = output_ds.rename_vars({ 'COUT': f"COUT_{item.properties['model']}" })
+#         output_ds = output_ds.rename_vars({ 'COUT': f"COUT_{item.properties['model']}" })
         
-        # else:
-        #     ds = dataset['COUT']
-        # if bbox:
-        #     ds = ds.sel(geo_y=slice(bbox[3],bbox[1]), geo_x=slice(bbox[0],bbox[2]))
-        # output_ds = ds * factor
-    return output_ds
+#         # else:
+#         #     ds = dataset['COUT']
+#         # if bbox:
+#         #     ds = ds.sel(geo_y=slice(bbox[3],bbox[1]), geo_x=slice(bbox[0],bbox[2]))
+#         # output_ds = ds * factor
+#     return output_ds
 
 
 def get_planetary_model(item, varname, bbox, factor):
@@ -91,9 +91,9 @@ def get_planetary_item_thr(item, varname, bbox, factor):
     return thread
 
 
-def get_seasonal_forecast_item_thr(item, varname, factor):
-    thread = ThreadReturn(target=get_seasonal_forecast_item, kwargs={"item":item,"varname":varname,"factor":factor})
-    return thread
+# def get_seasonal_forecast_item_thr(item, varname, factor):
+#     thread = ThreadReturn(target=get_seasonal_forecast_item, kwargs={"item":item,"varname":varname,"factor":factor})
+#     return thread
 
 
 def get_planetary_model_thr(item, varname, bbox, factor):

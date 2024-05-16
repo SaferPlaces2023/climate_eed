@@ -28,6 +28,8 @@ setuptools.setup(
         # 'netCDF4',
         'adlfs',
         'click',
+        # 's3fs',
+        'cdsapi'
     ],
     entry_points="""
       [console_scripts]

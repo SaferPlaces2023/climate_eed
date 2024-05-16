@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import pytest
 import xarray as xr
@@ -85,16 +86,17 @@ def test_ensemble_fetch_var_sel_model():
 def test_seasonal_forecasts_fetch_var():
     """Test the fetch_var_planetary function for seasonal_forecasts collection."""
     
-    # var_ensemble = "tasmax"
-    # start_date_str = "01-01-2095"
-    # end_date_str = "31-12-2100"
-    # # factor_sel = 1000
-    # location_str = ["30.0","9.0","40.0","19.0"]
-    # collections = ["cil-gdpcir-cc0","cil-gdpcir-cc-by"]
-    # query = {"cmip6:experiment_id": {"eq": "ssp370"}}
-    # models = ["GFDL-ESM4"]
-    collections = ["seasonal_forecasts"]
-    data_seasonal_forecasts = fetch_var_smhi()  #(collections=collections,repository="smhi")
+    living_lab = "georgia"
+    data_dir = "seasonal_forecast"
+    issue_date = "202404"
+    ftp_config= {
+        "url": os.environ.get("FTP_HOST"),
+        "folder": os.environ.get("FTP_DIR"),
+        "user": os.environ.get("FTP_USER"),
+        "passwd": os.environ.get("FTP_PASS")
+    }
+
+    data_seasonal_forecasts = fetch_var_smhi(living_lab=living_lab, data_dir=data_dir, issue_date=issue_date,ftp_config=ftp_config)  #(collections=collections,repository="smhi")
     
     print(data_seasonal_forecasts)
     print("----------------")
