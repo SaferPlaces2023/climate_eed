@@ -39,18 +39,14 @@ def read_netcdf(file_path):
 
 def smhi_data_request(living_lab="georgia", data_dir="seasonal_forecast", issue_date="202404",ftp_config=None):
     """
-    Fetches data from a STAC repository and returns it as an xarray dataset.
+    Fetches data from ftp server and returns it as an xarray dataset.
     Args:
-        - varname (str): The variable name to fetch. Example: "tasmax".
-        - factor (float): The factor to multiply the variable by. Example: 1000.
-        - bbox (list): The bounding box to fetch the data from. Example: [6.75, 36.75, 18.28, 47.00].
-        - start_date (str): The start date of the data to fetch. Example: "01-01-2020".
-        - end_date (str): The end date of the data to fetch. Example: "01-02-2020".
-        - repository (str): The STAC repository to fetch the data from. Example: "planetary".
-        - collections (str): The collections to fetch the data from. Example: "era5-pds".
-        - query (str): The query to filter the data by. Example: {"era5:kind": {"eq": "fc"}}.
+        - living_lab (str): The living lab to fetch the data from. Example: "georgia".
+        - data_dir (str): The data directory to fetch the data from. Example: "seasonal_forecast".
+        - issue_date (str): The issue date of the data to fetch. Example: "202404".
+        - ftp_config (dict): The configuration of the FTP server. Example: {"url": "ftp.smhi.se", "folder": "/climate_data", "user": "user", "passwd": "passwd"}.
     Returns:
-        - xr.Dataset: The data fetched from the STAC repository.
+        - xr.Dataset: The data fetched from the FTP server.
     """
     data_array = []
     if ftp_config is None:    

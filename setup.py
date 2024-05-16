@@ -1,6 +1,6 @@
 import setuptools
 
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 PACKAGE_NAME = "climate_eed"
 
 setuptools.setup(
